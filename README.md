@@ -485,6 +485,7 @@ result = tools["query_history"]._run(limit=5)
 ```
 Modulo2-1/
 ├── src/                    # Código fuente principal
+│   ├── main.py            # Punto de entrada del agente CLI
 │   ├── api_server.py      # Servidor API FastAPI
 │   ├── agent.py           # Agente principal con LangChain
 │   ├── __init__.py
@@ -493,7 +494,7 @@ Modulo2-1/
 │   │   └── agent_prompt.md
 │   └── tools/             # Herramientas del agente
 │       ├── __init__.py
-│       ├── transcriber.py # Transcripción con Whisper
+│       ├── transcriber.py # Transcripción con Deepgram API
 │       └── history.py     # Gestión de historial
 ├── data/                  # Datos de la aplicación
 │   ├── audio/            # Archivos de audio
@@ -501,6 +502,8 @@ Modulo2-1/
 │   └── transcriptions/   # Resultados
 │       └── output/
 │           └── history.csv
+├── docs/                 # Documentación técnica
+│   └── architecture.md   # Arquitectura detallada
 ├── tests/                # Pruebas unitarias
 ├── Dockerfile
 ├── requirements.txt
