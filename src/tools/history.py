@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 from langchain.tools import BaseTool
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class SaveTranscriptionInput(BaseModel):
@@ -182,6 +182,8 @@ Text: {text_preview}
 class SaveTranscriptionTool(BaseTool):
     """Specific tool for saving transcriptions."""
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     name: str = "save_transcription"
     description: str = (
         "Saves a transcription to the CSV history. "
@@ -189,11 +191,13 @@ class SaveTranscriptionTool(BaseTool):
         "the model used, and optionally the audio duration."
     )
     args_schema: Type[BaseModel] = SaveTranscriptionInput
+    history: Optional[HistoryTool] = Field(default=None, exclude=True)
 
     def __init__(self, **kwargs):
         """Initialize the tool with history instance."""
         super().__init__(**kwargs)
-        self.history = HistoryTool()
+        if self.history is None:
+            self.history = HistoryTool()
 
     def _run(
         self,
@@ -211,6 +215,8 @@ class SaveTranscriptionTool(BaseTool):
 class QueryHistoryTool(BaseTool):
     """Specific tool for querying history."""
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     name: str = "query_history"
     description: str = (
         "Queries the saved transcription history. "
@@ -218,11 +224,13 @@ class QueryHistoryTool(BaseTool):
         "Useful for reviewing previous work or finding specific content."
     )
     args_schema: Type[BaseModel] = QueryHistoryInput
+    history: Optional[HistoryTool] = Field(default=None, exclude=True)
 
     def __init__(self, **kwargs):
         """Initialize the tool with history instance."""
         super().__init__(**kwargs)
-        self.history = HistoryTool()
+        if self.history is None:
+            self.history = HistoryTool()
 
     def _run(
         self,
