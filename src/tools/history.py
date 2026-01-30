@@ -189,8 +189,12 @@ class SaveTranscriptionTool(BaseTool):
         "the model used, and optionally the audio duration."
     )
     args_schema: Type[BaseModel] = SaveTranscriptionInput
+    history: Optional[HistoryTool] = None
 
-    history: HistoryTool = Field(default_factory=lambda: HistoryTool())
+    def model_post_init(self, __context):
+        """Initialize history tool after model creation."""
+        if self.history is None:
+            self.history = HistoryTool()
 
     def _run(
         self,
@@ -215,8 +219,12 @@ class QueryHistoryTool(BaseTool):
         "Useful for reviewing previous work or finding specific content."
     )
     args_schema: Type[BaseModel] = QueryHistoryInput
+    history: Optional[HistoryTool] = None
 
-    history: HistoryTool = Field(default_factory=lambda: HistoryTool())
+    def model_post_init(self, __context):
+        """Initialize history tool after model creation."""
+        if self.history is None:
+            self.history = HistoryTool()
 
     def _run(
         self,
