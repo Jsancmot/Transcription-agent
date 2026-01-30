@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 from langchain.tools import BaseTool
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, PrivateAttr
 
 
 class SaveTranscriptionInput(BaseModel):
@@ -182,8 +182,6 @@ Text: {text_preview}
 class SaveTranscriptionTool(BaseTool):
     """Specific tool for saving transcriptions."""
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
     name: str = "save_transcription"
     description: str = (
         "Saves a transcription to the CSV history. "
@@ -191,13 +189,13 @@ class SaveTranscriptionTool(BaseTool):
         "the model used, and optionally the audio duration."
     )
     args_schema: Type[BaseModel] = SaveTranscriptionInput
-    history: Optional[HistoryTool] = Field(default=None, exclude=True)
+
+    _history: HistoryTool = PrivateAttr()
 
     def __init__(self, **kwargs):
         """Initialize the tool with history instance."""
         super().__init__(**kwargs)
-        if self.history is None:
-            self.history = HistoryTool()
+        self._history = HistoryTool()
 
     def _run(
         self,
@@ -206,7 +204,7 @@ class SaveTranscriptionTool(BaseTool):
         model: str = "whisper-base",
         duration: Optional[float] = None
     ) -> str:
-        return self.history.save_transcription(filename, text, model, duration)
+        return self._history.save_transcription(filename, text, model, duration)
 
     async def _arun(self, *args, **kwargs) -> str:
         return self._run(*args, **kwargs)
@@ -215,8 +213,6 @@ class SaveTranscriptionTool(BaseTool):
 class QueryHistoryTool(BaseTool):
     """Specific tool for querying history."""
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
     name: str = "query_history"
     description: str = (
         "Queries the saved transcription history. "
@@ -224,20 +220,20 @@ class QueryHistoryTool(BaseTool):
         "Useful for reviewing previous work or finding specific content."
     )
     args_schema: Type[BaseModel] = QueryHistoryInput
-    history: Optional[HistoryTool] = Field(default=None, exclude=True)
+
+    _history: HistoryTool = PrivateAttr()
 
     def __init__(self, **kwargs):
         """Initialize the tool with history instance."""
         super().__init__(**kwargs)
-        if self.history is None:
-            self.history = HistoryTool()
+        self._history = HistoryTool()
 
     def _run(
         self,
         search: Optional[str] = None,
         limit: int = 10
     ) -> str:
-        return self.history.query_history(search, limit)
+        return self._history.query_history(search, limit)
 
     async def _arun(self, *args, **kwargs) -> str:
         return self._run(*args, **kwargs)
