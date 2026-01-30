@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 from langchain.tools import BaseTool
-from pydantic import BaseModel, Field, ConfigDict, PrivateAttr
+from pydantic import BaseModel, Field
 
 
 class SaveTranscriptionInput(BaseModel):
@@ -190,13 +190,6 @@ class SaveTranscriptionTool(BaseTool):
     )
     args_schema: Type[BaseModel] = SaveTranscriptionInput
 
-    _history: HistoryTool = PrivateAttr()
-
-    def __init__(self, **kwargs):
-        """Initialize the tool with history instance."""
-        super().__init__(**kwargs)
-        self._history = HistoryTool()
-
     def _run(
         self,
         filename: str,
@@ -204,7 +197,8 @@ class SaveTranscriptionTool(BaseTool):
         model: str = "whisper-base",
         duration: Optional[float] = None
     ) -> str:
-        return self._history.save_transcription(filename, text, model, duration)
+        history = HistoryTool()
+        return history.save_transcription(filename, text, model, duration)
 
     async def _arun(self, *args, **kwargs) -> str:
         return self._run(*args, **kwargs)
@@ -221,19 +215,13 @@ class QueryHistoryTool(BaseTool):
     )
     args_schema: Type[BaseModel] = QueryHistoryInput
 
-    _history: HistoryTool = PrivateAttr()
-
-    def __init__(self, **kwargs):
-        """Initialize the tool with history instance."""
-        super().__init__(**kwargs)
-        self._history = HistoryTool()
-
     def _run(
         self,
         search: Optional[str] = None,
         limit: int = 10
     ) -> str:
-        return self._history.query_history(search, limit)
+        history = HistoryTool()
+        return history.query_history(search, limit)
 
     async def _arun(self, *args, **kwargs) -> str:
         return self._run(*args, **kwargs)
