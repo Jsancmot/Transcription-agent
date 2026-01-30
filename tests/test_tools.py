@@ -25,14 +25,14 @@ def test_transcription():
 
     # Skip in CI environment
     if IS_CI:
-        print("\n⏭️  Skipping transcription test in CI environment")
-        print("   (requires audio files and API keys)")
+        print("\n[SKIP] Skipping transcription test in CI environment")
+        print("       (requires audio files and API keys)")
         return
 
     # Check if there are sample audio files
     audio_dir = Path("audio_samples")
     if not audio_dir.exists() or not list(audio_dir.glob("*")):
-        print("\n⚠️  No audio files found in 'audio_samples/'")
+        print("\n[WARNING] No audio files found in 'audio_samples/'")
         print("\nTo test transcription:")
         print("1. Create the 'audio_samples' folder")
         print("2. Place an audio file (mp3, wav, etc.)")
@@ -53,8 +53,8 @@ def test_transcription():
         print("No compatible audio files found.")
         return
 
-    print(f"\n📁 Test file: {audio_file}")
-    print("\n⏳ Transcribing (this may take a few seconds)...\n")
+    print(f"\n[FILE] Test file: {audio_file}")
+    print("\n[INFO] Transcribing (this may take a few seconds)...\n")
 
     tool = TranscribeAudioTool()
     result = tool._run(
@@ -73,7 +73,7 @@ def test_history():
     print("="*70)
 
     # Save a test transcription
-    print("\n1️⃣ Saving test transcription...")
+    print("\n[1] Saving test transcription...")
     save_tool = SaveTranscriptionTool()
     result = save_tool._run(
         filename="test_audio.mp3",
@@ -84,22 +84,22 @@ def test_history():
     print(result)
 
     # Query the history
-    print("\n2️⃣ Querying history...")
+    print("\n[2] Querying history...")
     query_tool = QueryHistoryTool()
     result = query_tool._run(limit=5)
     print(result)
 
     # Search in history
-    print("\n3️⃣ Searching for 'test' in history...")
+    print("\n[3] Searching for 'test' in history...")
     result = query_tool._run(search="test", limit=5)
     print(result)
 
 
 def main():
     """Main function."""
-    print("\n" + "🧪"*35)
+    print("\n" + "="*70)
     print("  TOOLS TEST SCRIPT")
-    print("🧪"*35 + "\n")
+    print("="*70 + "\n")
 
     if IS_CI:
         print("Running in CI environment - some tests will be skipped\n")
@@ -108,19 +108,19 @@ def main():
     try:
         test_history()
     except Exception as e:
-        print(f"\n❌ History tests failed: {e}")
+        print(f"\n[ERROR] History tests failed: {e}")
         sys.exit(1)
 
     # Test transcription (requires audio file)
     try:
         test_transcription()
     except Exception as e:
-        print(f"\n❌ Transcription tests failed: {e}")
+        print(f"\n[ERROR] Transcription tests failed: {e}")
         if not IS_CI:  # Only fail in local environment
             sys.exit(1)
 
     print("\n" + "="*70)
-    print("✅ Tests completed successfully")
+    print("[SUCCESS] Tests completed successfully")
     print("="*70)
 
     if not IS_CI:
